@@ -77,4 +77,22 @@ To apply this on every request, change application/routes.php's before filter to
         return $fail_response;
     });
 
+### Test it in BASH:
+
+    #!/bin/bash
+    
+    DATE=$(date +"%d/%m/%Y")
+    URL=$(echo -n $1 | cut -c 8- | sed 's/^[a-z0-9\-\.]*//g')
+    PRIVATE="PrivateKeyGoesHere"
+    PUBLIC="PublicKeyGoesHere"
+    
+    HMAC=$(echo -n "$DATE-$PRIVATE-$URL?pk=$PUBLIC" | base64 | tr '\n' ' ' | sed 's/ //g' | sha256sum | sed 's/ .*//g')
+    
+    curl -v -H "HMAC-Auth: $HMAC" -X GET $1?pk=$PUBLIC && echo
+
+Just pass a URL in your Laravel application as an argument to the script (including the http://)
+
+If anybody has suggestions or comments, please contact me at [my website][2].
+
   [1]: http://n00bsys0p.co.uk/projects/laravel-hmac-authentication-bundle "Laravel-HMAC Project Page"
+  [2]: http://n00bsys0p.co.uk "n00bsys0p"
